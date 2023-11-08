@@ -1,0 +1,56 @@
+module loopback {
+  namespace "http://com/example/loopback";
+  prefix loopback;
+
+  import tailf-ncs {
+    prefix ncs;
+  }
+
+  import ietf-inet-types {
+    prefix inet;
+  }
+
+  import tailf-common {
+    prefix tailf;
+  }
+
+  list loopback {
+    key name;
+
+    uses ncs:service-data;
+    ncs:servicepoint "loopback-servicepoint";
+
+    leaf name {
+      tailf:info "Service instance name";
+      type string;
+    }
+
+    leaf device {
+      tailf:info "Device name";
+      type leafref {
+        path "/ncs:devices/ncs:device/ncs:name";
+      }
+    }
+
+    leaf management-intf {
+      tailf:info "Management loopback interface number";
+      type uint32;
+    }
+
+    leaf management-prefix {
+      tailf:info "IP prefix used to configure a management loopback interface";
+      type inet:ipv4-prefix;
+      mandatory true;
+    }
+
+    leaf bgp-intf {
+      tailf:info "BGP loopback interface number";
+      type uint32;
+    }
+    leaf bgp-prefix {
+      tailf:info "IP prefix used to configure a bgp loopback interface";
+      type inet:ipv4-prefix;
+      mandatory true;
+    }
+  }
+}

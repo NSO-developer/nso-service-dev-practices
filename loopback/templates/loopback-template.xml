@@ -1,0 +1,29 @@
+<config-template xmlns="http://tail-f.com/ns/config/1.0">
+  <devices xmlns="http://tail-f.com/ns/ncs">
+      <device>
+         <name>{/device}</name>
+         <config>
+           <interface xmlns="http://tail-f.com/ned/cisco-ios-xr">
+             <Loopback>
+               <id>{/management-intf}</id>
+               <ipv4>
+                 <address>
+                   <ip>{$MANAGEMENT_ADDRESS}</ip>
+                   <mask>255.255.255.255</mask>
+                 </address>
+               </ipv4>
+             </Loopback>
+             <Loopback>
+               <id>{/bgp-intf}</id>
+               <ipv4>
+                 <address>
+                   <ip>{$BGP_ADDRESS}</ip>
+                   <mask>255.255.255.255</mask>
+                 </address>
+               </ipv4>
+             </Loopback>
+           </interface>
+         </config>
+       </device>
+  </devices>
+</config-template>

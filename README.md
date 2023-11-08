@@ -49,7 +49,7 @@ make -C ~/src/nso-service-dev-practices/src/ all
 Output:
 ```
 developer:~ > make -C ~/src/nso-service-dev-practices/src/ all
-make: Entering directory '/home/developer/src/loopback/src'
+make: Entering directory '/home/developer/src/nso-service-dev-practices/loopback/src'
 pylint --rcfile=.pylintrc ../python/loopback
 ************* Module loopback.loopback
 /home/developer/src/loopback/python/loopback/loopback.py:1:0: C0114: Missing module docstring (missing-module-docstring)

@@ -23,7 +23,7 @@ You will learn how to use Pylint on an existing NSO package that uses Python to 
 
 ### Modify package Makefile to include pylint
 
-First add a recipe for running Pylint to the package Makefile. Open Makefile under `~/src/nso-service-dev-practices/loopback/src/Makefile` and add the the call for `pylint` target to the `all:` target on the first line:  
+First add a recipe for running Pylint to the package Makefile. Open Makefile under `~/src/nso-service-dev-practices/loopback/src/Makefile` and add the the call for `pylint` target to the `all:` target on the first line:
 
 ```Makefile
 all: fxs pylint
@@ -77,7 +77,7 @@ In the printout above you can see that pylint emits different types of messages:
 * W: Warning - These messages point out potential issues or code smells that might lead to problems but are not as critical as errors.
 * C: Convention - These messages relate to style and coding convention recommendations. They help ensure that your code adheres to a consistent style, making it more readable and maintainable.
 
-You can see that there are no errors detected in the loopback package, so lets first try to fix the warnings. 
+You can see that there are no errors detected in the loopback package, so lets first try to fix the warnings.
 
 The first warning message is:
 ```
@@ -150,11 +150,11 @@ Your code has been rated at 10.00/10 (previous run: 7.78/10, +2.22)
 
 # Write better Python code
 
-In the following section you will refactor Python NSO service callback function. It is intentionally written in a way that does not follow good practices of modularity, reusability and maintainability. With refactoring you will improve the code so that these good practices can be met. 
+In the following section you will refactor Python NSO service callback function. It is intentionally written in a way that does not follow good practices of modularity, reusability and maintainability. With refactoring you will improve the code so that these good practices can be met.
 
 ## Loopback Python example
 
-Open the `~/src/nso-service-dev-practices/loopback/python/loopback/loopback.py` example again and study its contents. 
+Open the `~/src/nso-service-dev-practices/loopback/python/loopback/loopback.py` example again and study its contents.
 
 ```python
 # -*- mode: python; python-indent: 4 -*-
@@ -209,7 +209,7 @@ class ServiceCallbacks(Service):
 -        self.log.debug(f'Value of bgp-prefix leaf is {bgp_prefix}')
 -        net = ipaddress.IPv4Network(bgp_prefix)
 -        bgp_address = list(net.hosts())[0]
- 
+
 +        management_address = calculate_ip_address(service.management_prefix)
 +        bgp_address = calculate_ip_address(service.bgp_prefix)
         tvars = ncs.template.Variables()
@@ -239,21 +239,21 @@ Python 3.11.2 (main, Jun 28 2023, 12:00:22) [GCC 8.5.0 20210514 (Red Hat 8.5.0-1
 Type "help", "copyright", "credits" or "license" for more information.
 >>> import ipaddress
 >>> net = ipaddress.IPv4Network('10.0.0.0/8')
->>> list(net.hosts())[0]          
+>>> list(net.hosts())[0]
 IPv4Address('10.0.0.1')
->>> 
+>>>
 ```
 It takes more than 10 seconds to get the IP address back since in the background Python is creating a list of more than 16 milion addresses. It gets even worse for IPv6 ranges. Such long calculations in the `cb_create` will significantly impact performance and throughput of the NSO system.
 
 The better way to get the first usable host address is to read just the next IP address from the generator that the library creates when you instantiate a new network object. Test the following snippet:
 ```
 net = ipaddress.IPv4Network('10.0.0.0/8')
-next(net.hosts())        
+next(net.hosts())
 ```
 Output:
 ```
 >>> net = ipaddress.IPv4Network('10.0.0.0/8')
->>> next(net.hosts())        
+>>> next(net.hosts())
 IPv4Address('10.0.0.1')
 ```
 The response now is almost instant. The final version of the refactored code should look like this:
@@ -287,10 +287,10 @@ Often during NSO development you need to test how some Python code works on the 
 You can use Python terminal on your NSO server and connect to the CDB through MAAPI session. By creating a maagic object you get the access to the CDB in the same way as from the `cb_create` in a service. Enter interactive Python terminal and use the following Python code:
 ```
 python3
-import ncs  
-m = ncs.maapi.Maapi()  
-m.start_user_session('admin', 'system', [])  
-trans = m.start_write_trans()  
+import ncs
+m = ncs.maapi.Maapi()
+m.start_user_session('admin', 'system', [])
+trans = m.start_write_trans()
 root = ncs.maagic.get_root(trans)
 ```
 Output:
@@ -298,20 +298,20 @@ Output:
 developer:~ > python3
 Python 3.11.2 (main, Jun 28 2023, 12:00:22) [GCC 8.5.0 20210514 (Red Hat 8.5.0-18)] on linux
 Type "help", "copyright", "credits" or "license" for more information.
->>> import ncs  
-m = ncs.maapi.Maapi()  
-m.start_user_session('admin', 'system', [])  
-trans = m.start_write_trans()  
+>>> import ncs
+m = ncs.maapi.Maapi()
+m.start_user_session('admin', 'system', [])
+trans = m.start_write_trans()
 root = ncs.maagic.get_root(trans)
 ```
 
 Through the `root` object you now have read write access to the CDB. The following example shows how to create device authgroup:
 
 ```
-import ncs  
-m = ncs.maapi.Maapi()  
-m.start_user_session('admin', 'system', [])  
-trans = m.start_write_trans()  
+import ncs
+m = ncs.maapi.Maapi()
+m.start_user_session('admin', 'system', [])
+trans = m.start_write_trans()
 root = ncs.maagic.get_root(trans)
 root.ncs__devices.authgroups.group.create('test')
 root.ncs__devices.authgroups.group['test'].default_map.create()
@@ -331,12 +331,12 @@ developer:~ > ncs_cli -C -u admin
 
 User admin last logged in 2023-09-20T11:57:17.670114+00:00, to devpod-7293941003772680233-7d74554b96-l2p9g, from 127.0.0.1 using cli-console
 admin connected from 127.0.0.1 using console on devpod-7293941003772680233-7d74554b96-l2p9g
-admin@ncs# show running-config devices authgroups 
+admin@ncs# show running-config devices authgroups
 devices authgroups group test
  default-map same-user
  default-map same-pass
 !
-admin@ncs# 
+admin@ncs#
 ```
 
 If you need help with the Python maagic data access you can use the CLI tool to generate the code for you. First enable devtools in the NSO CLI:
@@ -358,13 +358,13 @@ Then do the configuration that you want to do through maagic API. Instead of com
 config
 devices authgroups group test2 default-map same-user same-pass
 top
-show configuration | display maagic 
+show configuration | display maagic
 ```
 Output:
 ```
 admin@ncs(config)# devices authgroups group test default-map same-user same-pass
 admin@ncs(config)# top
-admin@ncs(config)# show configuration | display maagic 
+admin@ncs(config)# show configuration | display maagic
 root = ncs.maagic.get_root(t)
 root.ncs__devices.authgroups.group.create('test2')
 root.ncs__devices.authgroups.group['test2'].default-map.create()
@@ -382,7 +382,7 @@ admin@ncs# exit
 
 # Testing
 
-Testing is a critical and fundamental aspect of software development that plays an important role in ensuring the reliability, functionality, and overall quality of a software product. Testing in software development involves various approaches and levels to ensure that software works as intended. In the following example you will learn how to unit test the function that you have refactored for calculating ip addresses and how to automatically run it as part of service package build procedure. 
+Testing is a critical and fundamental aspect of software development that plays an important role in ensuring the reliability, functionality, and overall quality of a software product. Testing in software development involves various approaches and levels to ensure that software works as intended. In the following example you will learn how to unit test the function that you have refactored for calculating ip addresses and how to automatically run it as part of service package build procedure.
 
 As with Pylint, with this approach unit tests will be executed as part of a build job. If you are building your packages as part of a CI job the test will be executed in the CI too.
 
@@ -390,7 +390,7 @@ Another example will show how you can run and do the functional test of the serv
 
 ## Unit testing
 
-Write a unit test for the `calculate_ip_address` function. Start by creating a new folder `tests` inside a python folder of the loopback package. Then create a file inside called `test_loopback.py`. 
+Write a unit test for the `calculate_ip_address` function. Start by creating a new folder `tests` inside a python folder of the loopback package. Then create a file inside called `test_loopback.py`.
 
 ```
 mkdir ~/src/nso-service-dev-practices/loopback/python/tests
@@ -448,7 +448,7 @@ pylint:
 +	developer:src > python -m unittest discover --start-directory ../python/tests --top-level-directory ../python
 ```
 
-Now every time that you will build the `loopback` package the unit tests will be executed as well. This is useful since it ensures that any changes to the Python code that might break the `calculate_ip_address` function will be detected during package build. 
+Now every time that you will build the `loopback` package the unit tests will be executed as well. This is useful since it ensures that any changes to the Python code that might break the `calculate_ip_address` function will be detected during package build.
 
 Execute the following command to build the loopback package with unit testing included:
 ```
@@ -471,7 +471,7 @@ make: Leaving directory '/home/developer/src/loopback/src'
 
 In the following section you will implement a system test for the `loopback` package. This will test that the package successfully loads into the NSO and that you can create device configurations with it. For better control over the produced device configuration you will also implement saving of the device configuration after each test run and comparing it with the expected configuration.
 
-The idea behind this is that you inspect the configuration that loopback package creates for the given output and save it in the `expected_configuration` directory. After each test run you save the configuration into `output` directory and the compare `output` of a current test run with the known `expected_configuration`. 
+The idea behind this is that you inspect the configuration that loopback package creates for the given output and save it in the `expected_configuration` directory. After each test run you save the configuration into `output` directory and the compare `output` of a current test run with the known `expected_configuration`.
 
 This ensures that there are no unwanted configuration changes that would be result of a bad code or template change. If the change is expected you update the `expected_configuration` and the test will pass again.
 
@@ -490,7 +490,7 @@ developer:test > ncs-netsim create-device $NCS_DIR/packages/neds/cisco-iosxr-cli
 DEVICE core-router CREATED
 ```
 
-You will use `Make` automation tool for test automation that you are already familiar with from the package build process. 
+You will use `Make` automation tool for test automation that you are already familiar with from the package build process.
 
 Start by creating a `Makefile` file in the `test` folder.
 ```
@@ -539,7 +539,7 @@ reload-result {
     package loopback
     result true
 }
-admin@ncs# 
+admin@ncs#
 ```
 Exit NSO CLI.
 ```
@@ -710,7 +710,7 @@ make[2]: Leaving directory '/home/developer/src/nso-service-dev-practices/test'
 make[1]: *** [Makefile:23: test] Error 2
 make[1]: Leaving directory '/home/developer/src/nso-service-dev-practices/test'
 make: *** [Makefile:28: all] Error 2
-developer:test > 
+developer:test >
 ```
 
 As you can see the whole test flow was executed with a single `make` command. But the test was not successful. You can see that target that checks the diff between output and expected output failed. The reason for this is that you need to create
@@ -744,7 +744,7 @@ make check-diff
 make[1]: Entering directory '/home/developer/src/nso-service-dev-practices/test'
 diff -c expected/ output/
 make[1]: Leaving directory '/home/developer/src/nso-service-dev-practices/test'
-developer:test > 
+developer:test >
 ```
 
 There is no difference between the files and the test was successful. To see how `check-diff` detects unintended changes to the configuration break the `loopback-template.xml` file on purpose. Open the `~/src/nso-service-dev-practices/loopback/templates/loopback-template.xml` file in the editor and remove the line 21:
@@ -782,12 +782,12 @@ developer:src > ncs_cli -C -u admin
 
 User admin last logged in 2023-10-13T11:34:40.601179+00:00, to devpod-7430150751460313849-6b75d9874-c8gvn, from 127.0.0.1 using cli-console
 admin connected from 127.0.0.1 using console on devpod-7430150751460313849-6b75d9874-c8gvn
-admin@ncs# packages package loopback redeploy 
+admin@ncs# packages package loopback redeploy
 result true
 admin@ncs#
-admin@ncs# exit 
+admin@ncs# exit
 ```
-> Note: Since you only changed the template it is enough to just redeploy a package. When you are changing YANG model of a package then full packages reload is needed, which takes longer especially with big models. 
+> Note: Since you only changed the template it is enough to just redeploy a package. When you are changing YANG model of a package then full packages reload is needed, which takes longer especially with big models.
 
 Now execute the test target again and observe the output:
 ```
@@ -829,7 +829,7 @@ diff -c expected/device-loopback.xml output/device-loopback.xml
 make[1]: *** [Makefile:21: check-diff] Error 1
 make[1]: Leaving directory '/home/developer/src/nso-service-dev-practices/test'
 make: *** [Makefile:27: test] Error 2
-developer:test > 
+developer:test >
 ```
 
 As you can see in the output our target detected that `mask` is not configured anymore and the `test` target failed.

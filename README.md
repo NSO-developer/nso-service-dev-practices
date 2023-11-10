@@ -23,7 +23,7 @@ You will learn how to use Pylint on an existing NSO package that uses Python to 
 
 ### Modify package Makefile to include pylint
 
-First add a recipe for running Pylint to the package Makefile. Open Makefile under `~/src/nso-service-dev-practices/src/Makefile` and add the the call for `pylint` target to the `all:` target on the first line:  
+First add a recipe for running Pylint to the package Makefile. Open Makefile under `~/src/nso-service-dev-practices/loopback/src/Makefile` and add the the call for `pylint` target to the `all:` target on the first line:  
 
 ```Makefile
 all: fxs pylint
@@ -39,16 +39,16 @@ pylint:
 In the pylint target you have specified the .pylintrc file that should be used for linting this package. Generate the rcfile using pylint:
 
 ```bash
-pylint --generate-rcfile > ~/src/nso-service-dev-practices/src/.pylintrc
+pylint --generate-rcfile > ~/src/nso-service-dev-practices/loopback/src/.pylintrc
 ```
 
 Build the package using `all` target, this will also trigger the `pylint` target you added as a dependency:
 ```
-make -C ~/src/nso-service-dev-practices/src/ all
+make -C ~/src/nso-service-dev-practices/loopback/src/ all
 ```
 Output:
 ```
-developer:~ > make -C ~/src/nso-service-dev-practices/src/ all
+developer:~ > make -C ~/src/nso-service-dev-practices/loopback/src/ all
 make: Entering directory '/home/developer/src/nso-service-dev-practices/loopback/src'
 pylint --rcfile=.pylintrc ../python/loopback
 ************* Module loopback.loopback
@@ -136,11 +136,11 @@ disable=raw-checker-failed,
 Re-run the `make all` command. Now all errors are fixed or suppressed and the build is successful.
 
 ```bash
-make -C ~/src/nso-service-dev-practices/src/ all
+make -C ~/src/nso-service-dev-practices/loopback/src/ all
 ```
 Output:
 ```bash
-developer:~ > make -C ~/src/nso-service-dev-practices/src/ all
+developer:~ > make -C ~/src/nso-service-dev-practices/loopback/src/ all
 pylint --rcfile=.pylintrc ../python/loopback
 
 -------------------------------------------------------------------
@@ -153,7 +153,7 @@ In the following section you will refactor Python NSO service callback function.
 
 ## Loopback Python example
 
-Open the `~/src/nso-service-dev-practices/python/loopback/loopback.py` example again and study its contents. 
+Open the `~/src/nso-service-dev-practices/loopback/python/loopback/loopback.py` example again and study its contents. 
 
 ```python
 # -*- mode: python; python-indent: 4 -*-
@@ -277,7 +277,7 @@ def calculate_ip_address(prefix):
     return str(next(net.hosts()))
 ```
 
-Make sure that the final version of the `~/src/nso-service-dev-practices/python/loopback/loopback.py` looks like the snippet above since you will use this version of the code to implement unit tests.
+Make sure that the final version of the `~/src/nso-service-dev-practices/loopback/python/loopback/loopback.py` looks like the snippet above since you will use this version of the code to implement unit tests.
 
 # Use interactive Python terminal to speed up prototyping
 
@@ -392,9 +392,9 @@ Another example will show how you can run and do the functional test of the serv
 Write a unit test for the `calculate_ip_address` function. Start by creating a new folder `tests` inside a python folder of the loopback package. Then create a file inside called `test_loopback.py`. 
 
 ```
-mkdir ~/src/nso-service-dev-practices/python/tests
-touch ~/src/nso-service-dev-practices/python/tests/test_loopback.py
-touch ~/src/nso-service-dev-practices/python/tests/__init__.py
+mkdir ~/src/nso-service-dev-practices/loopback/python/tests
+touch ~/src/nso-service-dev-practices/loopback/python/tests/test_loopback.py
+touch ~/src/nso-service-dev-practices/loopback/python/tests/__init__.py
 ```
 
 > Note: The \_\_init\_\_.py file is needed so that `test_loopback.py` file is recognized by unittest library as Python module.
@@ -411,16 +411,16 @@ class TestLoopbackService(unittest.TestCase):
         self.assertEqual('192.168.10.1', calculate_ip_address('192.168.10.0/24'))
 ```
 
-Execute the unit test by running the following command from the `~/src/nso-service-dev-practices/src` directory:
+Execute the unit test by running the following command from the `~/src/nso-service-dev-practices/loopback/src` directory:
 
 ```
-cd ~/src/nso-service-dev-practices/src/
+cd ~/src/nso-service-dev-practices/loopback/src/
 python -m unittest discover --start-directory ../python/tests --top-level-directory ../python
 ```
 
 Output:
 ```
-developer:~ > cd ~/src/nso-service-dev-practices/src/
+developer:~ > cd ~/src/nso-service-dev-practices/loopback/src/
 developer:src > python -m unittest discover --start-directory ../python/tests --top-level-directory ../python
 .
 ----------------------------------------------------------------------
@@ -444,11 +444,11 @@ Now every time that you will build the `loopback` package the unit tests will be
 
 Execute the following command to build the loopback package with unit testing included:
 ```
-make -C ~/src/nso-service-dev-practices/src all
+make -C ~/src/nso-service-dev-practices/loopback/src all
 ```
 Output:
 ```
-developer:src > make -C ~/src/nso-service-dev-practices/src all
+developer:src > make -C ~/src/nso-service-dev-practices/loopback/src all
 make: Entering directory '/home/developer/src/loopback/src'
 python -m unittest discover --start-directory ../python/tests --top-level-directory ../python
 .
@@ -470,14 +470,14 @@ This ensures that there are no unwanted configuration changes that would be resu
 Start by creating a netsim device that you will configure with loopback interfaces in the test. Create new folder `test` and use `ncs-netsim` command to add a ios-xr device to it.
 
 ```
-mkdir ~/src/nso-service-dev-practices/test
-cd ~/src/nso-service-dev-practices/test
+mkdir ~/src/nso-service-dev-practices/loopback/test
+cd ~/src/nso-service-dev-practices/loopback/test
 ncs-netsim create-device $NCS_DIR/packages/neds/cisco-iosxr-cli-3.5/ core-router
 ```
 Output:
 ```
-developer:src > mkdir ~/src/nso-service-dev-practices/test
-developer:src > cd ~/src/nso-service-dev-practices/test
+developer:src > mkdir ~/src/nso-service-dev-practices/loopback/test
+developer:src > cd ~/src/nso-service-dev-practices/loopback/test
 developer:test > ncs-netsim create-device $NCS_DIR/packages/neds/cisco-iosxr-cli-3.5/ core-router
 DEVICE core-router CREATED
 ```
@@ -486,7 +486,7 @@ You will use `Make` automation tool for test automation that you are already fam
 
 Start by creating a `Makefile` file in the `test` folder.
 ```
-touch ~/src/nso-service-dev-practices/test/Makefile
+touch ~/src/nso-service-dev-practices/loopback/test/Makefile
 ```
 
  Add the following `start` target to the created `Makefile` that will start the generated netsim device:
@@ -540,7 +540,7 @@ admin@ncs# exit
 
 In the `test` directory run the following command:
 ```
-cd ~/src/nso-service-dev-practices/test
+cd ~/src/nso-service-dev-practices/loopback/test
 ncs-netsim ncs-xml-init > core-router.xml
 ```
 
@@ -580,8 +580,8 @@ remove-loopback:
 
 Create two folders in `test`: `expected` to store configuration that is examined and tested, and `output` where configuration after each test execution is stored.
 ```
-mkdir ~/src/nso-service-dev-practices/test/expected
-mkdir ~/src/nso-service-dev-practices/test/output
+mkdir ~/src/nso-service-dev-practices/loopback/test/expected
+mkdir ~/src/nso-service-dev-practices/loopback/test/output
 ```
 
 To the `Makefile` add `save-output` target that will store the device configuration from the NSO to the `output/device-loopback.xml` file.
@@ -648,12 +648,12 @@ all:
 
 Now invoke the `all` target to start the netsim device, configure NSO with prerequisite configuration and test the package:
 ```
-make -C ~/src/nso-service-dev-practices/test all
+make -C ~/src/nso-service-dev-practices/loopback/test all
 ```
 
 Output:
 ```
-developer:test > make -C ~/src/nso-service-dev-practices/test all
+developer:test > make -C ~/src/nso-service-dev-practices/loopback/test all
 make start
 make[1]: Entering directory '/home/developer/src/test'
 ncs-netsim --dir netsim stop
@@ -706,19 +706,19 @@ developer:test >
 ```
 
 As you can see the whole test flow was executed with a single `make` command. But the test was not successful. You can see that target that checks the diff between output and expected output failed. The reason for this is that you need to create
-the expected file - you can do so by examining and copying the file `~/src/nso-service-dev-practices/test/output/device-loopback.xml` created in the output directory. Open and study the output file in the editor. Alternatively, you can check the file through the terminal:
+the expected file - you can do so by examining and copying the file `~/src/nso-service-dev-practices/loopback/test/output/device-loopback.xml` created in the output directory. Open and study the output file in the editor. Alternatively, you can check the file through the terminal:
 ```
-cat ~/src/nso-service-dev-practices/test/output/device-loopback.xml
+cat ~/src/nso-service-dev-practices/loopback/test/output/device-loopback.xml
 ```
 
 After you make sure that this is the expected configuration created by loopback package copy it over to `expected` directory:
 ```
-cp ~/src/nso-service-dev-practices/test/output/device-loopback.xml expected/
+cp ~/src/nso-service-dev-practices/loopback/test/output/device-loopback.xml expected/
 ```
 
 Execute the test again. This time you can only execute the `test` target since test environment is already running:
 ```
-make -C ~/src/nso-service-dev-practices/test test
+make -C ~/src/nso-service-dev-practices/loopback/test test
 ```
 Output:
 ```
@@ -739,7 +739,7 @@ make[1]: Leaving directory '/home/developer/src/test'
 developer:test > 
 ```
 
-There is no difference between the files and the test was successful. To see how `check-diff` detects unintended changes to the configuration break the `loopback-template.xml` file on purpose. Open the `~/src/nso-service-dev-practices/templates/loopback-template.xml` file in the editor and remove the line 21:
+There is no difference between the files and the test was successful. To see how `check-diff` detects unintended changes to the configuration break the `loopback-template.xml` file on purpose. Open the `~/src/nso-service-dev-practices/loopback/templates/loopback-template.xml` file in the editor and remove the line 21:
 ```diff
 			  <Loopback>
                <id>{/bgp-intf}</id>
@@ -755,11 +755,11 @@ There is no difference between the files and the test was successful. To see how
 
 This will create the bgp loopback interface without the mask. Copy changed file to NSO running directory:
 ```
-cp ~/src/nso-service-dev-practices/templates/loopback-template.xml $NCS_RUN_DIR/packages/loopback/templates/
+cp ~/src/nso-service-dev-practices/loopback/templates/loopback-template.xml $NCS_RUN_DIR/packages/loopback/templates/
 ```
 Output:
 ```
-developer:src > cp ~/src/nso-service-dev-practices/templates/loopback-template.xml $NCS_RUN_DIR/packages/loopback/templates/
+developer:src > cp ~/src/nso-service-dev-practices/loopback/templates/loopback-template.xml $NCS_RUN_DIR/packages/loopback/templates/
 ```
 
 Enter NSO CLI and redeploy the loopback package:
@@ -783,7 +783,7 @@ admin@ncs# exit
 
 Now execute the test target again and observe the output:
 ```
-make -C ~/src/nso-service-dev-practices/test test
+make -C ~/src/nso-service-dev-practices/loopback/test test
 ```
 Output:
 ```

@@ -119,7 +119,7 @@ import ncs
 from ncs.application import Service
 ```
 There are now only documentation related convention messages. In case you want to ignore them package wide you can suppress them by changing the `.pylintrc` file. Open it and find keyword `disable` under MESSAGES CONTROL section. Add the convention messages that are still triggered:
-```
+```diff
 disable=raw-checker-failed,
         bad-inline-option,
         locally-disabled,
@@ -127,10 +127,11 @@ disable=raw-checker-failed,
         suppressed-message,
         useless-suppression,
         deprecated-pragma,
-        use-symbolic-message-instead,
-        C0114,
-        C0115,
-        C0116
+-       use-symbolic-message-instead
++       use-symbolic-message-instead,
++       C0114,
++       C0115,
++       C0116
 ```
 
 Re-run the `make all` command. Now all errors are fixed or suppressed and the build is successful.
@@ -431,13 +432,20 @@ OK
 
 Open the `Makefile` in the loopback package and add the `test` target as dependency to the `all` target. Then add the `test` target that should execute the `unittest` you manually executed before.
 
-```
-all: fxs pylint test
+```diff
+-all: fxs pylint
++all: fxs pylint test
+.PHONY: all
 
+# Include standard NCS examples build definitions and rules
+include $(NCS_DIR)/src/ncs/build/include.ncs.mk
 ...
 
-test:
-    developer:src > python -m unittest discover --start-directory ../python/tests --top-level-directory ../python
+pylint:
+	pylint --rcfile=.pylintrc ../python/loopback
+
++test:
++    developer:src > python -m unittest discover --start-directory ../python/tests --top-level-directory ../python
 ```
 
 Now every time that you will build the `loopback` package the unit tests will be executed as well. This is useful since it ensures that any changes to the Python code that might break the `calculate_ip_address` function will be detected during package build. 
@@ -470,14 +478,14 @@ This ensures that there are no unwanted configuration changes that would be resu
 Start by creating a netsim device that you will configure with loopback interfaces in the test. Create new folder `test` and use `ncs-netsim` command to add a ios-xr device to it.
 
 ```
-mkdir ~/src/nso-service-dev-practices/loopback/test
-cd ~/src/nso-service-dev-practices/loopback/test
+mkdir ~/src/nso-service-dev-practices/test
+cd ~/src/nso-service-dev-practices/test
 ncs-netsim create-device $NCS_DIR/packages/neds/cisco-iosxr-cli-3.5/ core-router
 ```
 Output:
 ```
-developer:src > mkdir ~/src/nso-service-dev-practices/loopback/test
-developer:src > cd ~/src/nso-service-dev-practices/loopback/test
+developer:src > mkdir ~/src/nso-service-dev-practices/test
+developer:src > cd ~/src/nso-service-dev-practices/test
 developer:test > ncs-netsim create-device $NCS_DIR/packages/neds/cisco-iosxr-cli-3.5/ core-router
 DEVICE core-router CREATED
 ```
@@ -486,7 +494,7 @@ You will use `Make` automation tool for test automation that you are already fam
 
 Start by creating a `Makefile` file in the `test` folder.
 ```
-touch ~/src/nso-service-dev-practices/loopback/test/Makefile
+touch ~/src/nso-service-dev-practices/test/Makefile
 ```
 
  Add the following `start` target to the created `Makefile` that will start the generated netsim device:
@@ -540,7 +548,7 @@ admin@ncs# exit
 
 In the `test` directory run the following command:
 ```
-cd ~/src/nso-service-dev-practices/loopback/test
+cd ~/src/nso-service-dev-practices/test
 ncs-netsim ncs-xml-init > core-router.xml
 ```
 
@@ -580,8 +588,8 @@ remove-loopback:
 
 Create two folders in `test`: `expected` to store configuration that is examined and tested, and `output` where configuration after each test execution is stored.
 ```
-mkdir ~/src/nso-service-dev-practices/loopback/test/expected
-mkdir ~/src/nso-service-dev-practices/loopback/test/output
+mkdir ~/src/nso-service-dev-practices/test/expected
+mkdir ~/src/nso-service-dev-practices/test/output
 ```
 
 To the `Makefile` add `save-output` target that will store the device configuration from the NSO to the `output/device-loopback.xml` file.
@@ -648,12 +656,12 @@ all:
 
 Now invoke the `all` target to start the netsim device, configure NSO with prerequisite configuration and test the package:
 ```
-make -C ~/src/nso-service-dev-practices/loopback/test all
+make -C ~/src/nso-service-dev-practices/test all
 ```
 
 Output:
 ```
-developer:test > make -C ~/src/nso-service-dev-practices/loopback/test all
+developer:test > make -C ~/src/nso-service-dev-practices/test all
 make start
 make[1]: Entering directory '/home/developer/src/test'
 ncs-netsim --dir netsim stop
@@ -706,19 +714,19 @@ developer:test >
 ```
 
 As you can see the whole test flow was executed with a single `make` command. But the test was not successful. You can see that target that checks the diff between output and expected output failed. The reason for this is that you need to create
-the expected file - you can do so by examining and copying the file `~/src/nso-service-dev-practices/loopback/test/output/device-loopback.xml` created in the output directory. Open and study the output file in the editor. Alternatively, you can check the file through the terminal:
+the expected file - you can do so by examining and copying the file `~/src/nso-service-dev-practices/test/output/device-loopback.xml` created in the output directory. Open and study the output file in the editor. Alternatively, you can check the file through the terminal:
 ```
-cat ~/src/nso-service-dev-practices/loopback/test/output/device-loopback.xml
+cat ~/src/nso-service-dev-practices/test/output/device-loopback.xml
 ```
 
 After you make sure that this is the expected configuration created by loopback package copy it over to `expected` directory:
 ```
-cp ~/src/nso-service-dev-practices/loopback/test/output/device-loopback.xml expected/
+cp ~/src/nso-service-dev-practices/test/output/device-loopback.xml expected/
 ```
 
 Execute the test again. This time you can only execute the `test` target since test environment is already running:
 ```
-make -C ~/src/nso-service-dev-practices/loopback/test test
+make -C ~/src/nso-service-dev-practices/test test
 ```
 Output:
 ```
@@ -783,7 +791,7 @@ admin@ncs# exit
 
 Now execute the test target again and observe the output:
 ```
-make -C ~/src/nso-service-dev-practices/loopback/test test
+make -C ~/src/nso-service-dev-practices/test test
 ```
 Output:
 ```

@@ -445,7 +445,7 @@ pylint:
 	pylint --rcfile=.pylintrc ../python/loopback
 
 +test:
-+    developer:src > python -m unittest discover --start-directory ../python/tests --top-level-directory ../python
++	developer:src > python -m unittest discover --start-directory ../python/tests --top-level-directory ../python
 ```
 
 Now every time that you will build the `loopback` package the unit tests will be executed as well. This is useful since it ensures that any changes to the Python code that might break the `calculate_ip_address` function will be detected during package build. 
@@ -510,7 +510,7 @@ A good practice is to write the targets in an immutable manner - here we are alw
 
 Continue by copying the loopback package to the NSO running directory. Also copy iosxr-cli-3.5 NED from the installation directory.
 ```
-cp -r ~/src/nso-service-dev-practices $NCS_RUN_DIR/packages/
+cp -r ~/src/nso-service-dev-practices/loopback $NCS_RUN_DIR/packages/
 cp -r $NCS_DIR/packages/neds/cisco-iosxr-cli-3.5 $NCS_RUN_DIR/packages/
 ```
 
@@ -643,10 +643,10 @@ check-diff:
 	diff -c expected/ output/
 
 test:
-    $(MAKE) remove-loopback
-    $(MAKE) configure-loopback
-    $(MAKE) save-output
-    $(MAKE) check-diff
+	$(MAKE) remove-loopback
+	$(MAKE) configure-loopback
+	$(MAKE) save-output
+	$(MAKE) check-diff
 
 all:
 	$(MAKE) start
@@ -663,14 +663,14 @@ Output:
 ```
 developer:test > make -C ~/src/nso-service-dev-practices/test all
 make start
-make[1]: Entering directory '/home/developer/src/test'
+make[1]: Entering directory '/home/developer/src/nso-service-dev-practices/test'
 ncs-netsim --dir netsim stop
 DEVICE core-router STOPPED
 ncs-netsim --dir netsim start
 DEVICE core-router OK STARTED
-make[1]: Leaving directory '/home/developer/src/test'
+make[1]: Leaving directory '/home/developer/src/nso-service-dev-practices/test'
 make add-device
-make[1]: Entering directory '/home/developer/src/test'
+make[1]: Entering directory '/home/developer/src/nso-service-dev-practices/test'
 echo -e "config\n devices authgroup group default default-map remote-name admin remote-password admin\ncommit\n" | ncs_cli -C -u admin
 Commit complete.
 ncs_load -m -l core-router.xml
@@ -689,26 +689,26 @@ fetch-result {
 }
 echo "devices device core-router sync-from" | ncs_cli -C -u ad
 result true
-make[1]: Leaving directory '/home/developer/src/test'
+make[1]: Leaving directory '/home/developer/src/nso-service-dev-practices/test'
 make test
-make[1]: Entering directory '/home/developer/src/test'
+make[1]: Entering directory '/home/developer/src/nso-service-dev-practices/test'
 make configure-loopback
-make[2]: Entering directory '/home/developer/src/test'
+make[2]: Entering directory '/home/developer/src/nso-service-dev-practices/test'
 echo -e "config\nloopback test device core-router management-intf 1 management-prefix 10.0.0.0/24 bgp-intf 2 bgp-prefix 192.168.0.0/24\ncommit\n" | ncs_cli -C -u admin
 Commit complete.
-make[2]: Leaving directory '/home/developer/src/test'
+make[2]: Leaving directory '/home/developer/src/nso-service-dev-practices/test'
 make save-output
-make[2]: Entering directory '/home/developer/src/test'
+make[2]: Entering directory '/home/developer/src/nso-service-dev-practices/test'
 ncs_load -P "/devices/device[name='core-router']/config" -F p > output/device-loopback.xml
-make[2]: Leaving directory '/home/developer/src/test'
+make[2]: Leaving directory '/home/developer/src/nso-service-dev-practices/test'
 make check-diff
-make[2]: Entering directory '/home/developer/src/test'
+make[2]: Entering directory '/home/developer/src/nso-service-dev-practices/test'
 diff -c expected/ output/
 Only in output/: device-loopback.xml
 make[2]: *** [Makefile:18: check-diff] Error 1
-make[2]: Leaving directory '/home/developer/src/test'
+make[2]: Leaving directory '/home/developer/src/nso-service-dev-practices/test'
 make[1]: *** [Makefile:23: test] Error 2
-make[1]: Leaving directory '/home/developer/src/test'
+make[1]: Leaving directory '/home/developer/src/nso-service-dev-practices/test'
 make: *** [Makefile:28: all] Error 2
 developer:test > 
 ```
@@ -732,18 +732,18 @@ Output:
 ```
 developer:test > make test
 make configure-loopback
-make[1]: Entering directory '/home/developer/src/test'
+make[1]: Entering directory '/home/developer/src/nso-service-dev-practices/test'
 echo -e "config\nloopback test device core-router management-intf 1 management-prefix 10.0.0.0/24 bgp-intf 2 bgp-prefix 192.168.0.0/24\ncommit\n" | ncs_cli -C -u admin
 % No modifications to commit.
-make[1]: Leaving directory '/home/developer/src/test'
+make[1]: Leaving directory '/home/developer/src/nso-service-dev-practices/test'
 make save-output
-make[1]: Entering directory '/home/developer/src/test'
+make[1]: Entering directory '/home/developer/src/nso-service-dev-practices/test'
 ncs_load -P "/devices/device[name='core-router']/config" -F p > output/device-loopback.xml
-make[1]: Leaving directory '/home/developer/src/test'
+make[1]: Leaving directory '/home/developer/src/nso-service-dev-practices/test'
 make check-diff
-make[1]: Entering directory '/home/developer/src/test'
+make[1]: Entering directory '/home/developer/src/nso-service-dev-practices/test'
 diff -c expected/ output/
-make[1]: Leaving directory '/home/developer/src/test'
+make[1]: Leaving directory '/home/developer/src/nso-service-dev-practices/test'
 developer:test > 
 ```
 
@@ -797,21 +797,21 @@ Output:
 ```
 developer:test > make test
 make remove-loopback
-make[1]: Entering directory '/home/developer/src/test'
+make[1]: Entering directory '/home/developer/src/nso-service-dev-practices/test'
 echo -e "config\n no loopback\ncommit\n" | ncs_cli -C -u admin
 % No modifications to commit.
-make[1]: Leaving directory '/home/developer/src/test'
+make[1]: Leaving directory '/home/developer/src/nso-service-dev-practices/test'
 make configure-loopback
-make[1]: Entering directory '/home/developer/src/test'
+make[1]: Entering directory '/home/developer/src/nso-service-dev-practices/test'
 echo -e "config\nloopback test device core-router management-intf 1 management-prefix 10.0.0.0/24 bgp-intf 2 bgp-prefix 192.168.0.0/24\ncommit\n" | ncs_cli -C -u admin
 Commit complete.
-make[1]: Leaving directory '/home/developer/src/test'
+make[1]: Leaving directory '/home/developer/src/nso-service-dev-practices/test'
 make save-output
-make[1]: Entering directory '/home/developer/src/test'
+make[1]: Entering directory '/home/developer/src/nso-service-dev-practices/test'
 ncs_load -P "/devices/device[name='core-router']/config" -F p > output/device-loopback.xml
-make[1]: Leaving directory '/home/developer/src/test'
+make[1]: Leaving directory '/home/developer/src/nso-service-dev-practices/test'
 make check-diff
-make[1]: Entering directory '/home/developer/src/test'
+make[1]: Entering directory '/home/developer/src/nso-service-dev-practices/test'
 diff -c expected/ output/
 diff -c expected/device-loopback.xml output/device-loopback.xml
 *** expected/device-loopback.xml        2023-10-13 11:32:25.373773316 +0000
@@ -827,7 +827,7 @@ diff -c expected/device-loopback.xml output/device-loopback.xml
             </Loopback>
 --- 18,23 ----
 make[1]: *** [Makefile:21: check-diff] Error 1
-make[1]: Leaving directory '/home/developer/src/test'
+make[1]: Leaving directory '/home/developer/src/nso-service-dev-practices/test'
 make: *** [Makefile:27: test] Error 2
 developer:test > 
 ```

@@ -721,7 +721,7 @@ cat ~/src/nso-service-dev-practices/test/output/device-loopback.xml
 
 After you make sure that this is the expected configuration created by loopback package copy it over to `expected` directory:
 ```
-cp ~/src/nso-service-dev-practices/test/output/device-loopback.xml expected/
+cp ~/src/nso-service-dev-practices/test/output/device-loopback.xml ~/src/nso-service-dev-practices/test/expected/
 ```
 
 Execute the test again. This time you can only execute the `test` target since test environment is already running:

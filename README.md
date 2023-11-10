@@ -190,7 +190,7 @@ The function to calculate the address from the prefix should look like this:
 ```python
 def calculate_ip_address(prefix):
     net = ipaddress.IPv4Network(prefix)
-    return str(next(net.hosts()))
+    return list(net.hosts())[0]
 ```
 
 In `the cb_create` then just call the function for the management address and the bgp address calculation:
@@ -221,7 +221,7 @@ class ServiceCallbacks(Service):
 
 +def calculate_ip_address(prefix):
 +    net = ipaddress.IPv4Network(prefix)
-+    return str(next(net.hosts()))
++    return list(net.hosts())[0]
 ```
 
 Another problem with the code is incorrect usage of the ipaddress library. Currently we are generating a list of all the host addresses that exists for give prefix. This is time and space consuming. In the terminal tab enter `python3` to enter Python terminal and type in the following snippet. Press enter and observe how long does it take for the address to be returned:
@@ -229,7 +229,7 @@ Another problem with the code is incorrect usage of the ipaddress library. Curre
 python3
 import ipaddress
 net = ipaddress.IPv4Network('10.0.0.0/8')
-list(net.hosts())[0]          
+list(net.hosts())[0]
 ```
 
 Output:

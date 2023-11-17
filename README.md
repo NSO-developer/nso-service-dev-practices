@@ -1,6 +1,10 @@
 # Good software development practices
 
+[![Run in Cisco Cloud IDE](https://static.production.devnetcloud.com/codeexchange/assets/images/devnet-runable-icon.svg)](https://developer.cisco.com/codeexchange/devenv/NSO-developer/nso-service-dev-practices)
+
 Learn more about software development practices you should follow when developing NSO services.
+
+[Click here](https://developer.cisco.com/codeexchange/devenv/NSO-developer/nso-service-dev-practices) to practice this Lab on the NSO Playground.
 
 ## Objectives
 

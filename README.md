@@ -6,6 +6,12 @@ Learn more about software development practices you should follow when developin
 
 [Click here](https://developer.cisco.com/codeexchange/devenv/NSO-developer/nso-service-dev-practices) to practice this Lab on the NSO Playground.
 
+If you want to learn more about good software development practices check this presentation from Cisco Developer Days NY: 
+
+Presentation: https://community.cisco.com/t5/nso-developer-hub-knowledge-articles/2023-devdays-us-good-software-practices-in-nso-development/ta-p/4983108
+
+Recording: https://www.youtube.com/watch?v=i2Cf7gPOcsQ
+
 ## Objectives
 
 After completing this Lab you will:
